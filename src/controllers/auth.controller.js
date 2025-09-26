@@ -1,4 +1,4 @@
-import { createError } from "../utils/errorHandler.js";
+import { createError } from "../utils/errorhandler.js";
 
 export const login = async (req, res, next) => {
   try {

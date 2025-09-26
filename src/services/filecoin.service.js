@@ -1,5 +1,5 @@
 import { create } from "@web3-storage/w3up-client";
-import { createError } from "../utils/errorHandler.js";
+import { createError } from "../utils/errorhandler.js";
 
 // service file to handle my filecoin storage and retrieval
 class FilecoinService {

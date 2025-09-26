@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "fs/promises";
-import AnalysisService from "../services/AnalysisService.js";
-import { createError } from "../utils/errorHandler.js";
+import AnalysisService from "../services/analysis.service.js";
+import { createError } from "../utils/errorhandler.js";
 
 // I will run AI anomaly detection here and generate the report
 export const analyzeDataset = async (req, res, next) => {

@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { parse } from "csv-parse";
 import { validateElectionSchema } from "../utils/validator.js";
-import { createError } from "../utils/errorHandler.js";
+import { createError } from "../utils/errorhandler.js";
 
 // trying to implement a simple dataset upload and validation
 export const uploadDataset = async (req, res, next) => {

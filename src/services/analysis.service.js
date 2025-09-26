@@ -1,38 +1,50 @@
+import SynthikClient, { ColumnBuilder } from "synthik-client";
 // import ivm from "isolated-vm"; this will actually take too much CPU/memory from me rn, so later
 
 // my AI anomaly detection will be here as well as my Synthik integration
 class AnalysisService {
   static async detectAnomalies(dataset) {
-    // simple  anomaly detection
+    // I'm implementing  anomaly detection in a very simple, rule-based way.
     const anomalies = dataset.filter((record) => {
       const voteCount = parseInt(record.votes, 10);
-      return voteCount < 0 || voteCount > 10000; // Simple rule because I'm only building for demo rn
+      return voteCount < 0 || voteCount > 10000;
     });
 
-    // Integrating with Synthik API for synthetic data (dummy rn)
     try {
-      const response = await fetch("https://api.synthik.com/generate", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.SYNTHIK_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ schema: dataset[0], count: 10 }),
+      const client = new SynthikClient();
+
+      //Need to build a schema from the dataset[0] ( this is my basic demo version)
+      const req = {
+        num_rows: 10,
+        topic: "Election voting records",
+        columns: [
+          ColumnBuilder.int("votes", {
+            description: "Vote count per candidate",
+            constraints: { min: 0, max: 20000 },
+          }).build(),
+          ColumnBuilder.string("candidate", {
+            description: "Candidate name",
+          }).build(),
+          ColumnBuilder.string("district", {
+            description: "District identifier",
+          }).build(),
+        ],
+      };
+
+      const syntheticData = await client.tabular.generate(req, {
+        strategy: "adaptive_flow",
+        format: "json",
       });
 
-      if (response.ok) {
-        const syntheticData = await response.json();
-
-        // Simple synthetic vs real comparison
-        const additionalAnomalies = dataset.filter((record, i) => {
-          const synthetic = syntheticData[i % syntheticData.length];
-          return Math.abs(record.votes - synthetic.votes) > 5000;
-        });
-
-        anomalies.push(...additionalAnomalies);
-      }
+      // Compare dataset with syntheticData
+      syntheticData.forEach((synthetic, i) => {
+        const record = dataset[i % dataset.length];
+        if (Math.abs(record.votes - synthetic.votes) > 5000) {
+          anomalies.push(record);
+        }
+      });
     } catch (error) {
-      console.error("Synthik API error:", error.message);
+      console.error("Synthik SDK error:", error.message);
     }
 
     return anomalies;

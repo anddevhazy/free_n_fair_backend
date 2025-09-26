@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
-import FilecoinService from "../services/FilecoinService.js";
-import { createError } from "../utils/errorHandler.js";
+import FilecoinService from "../services/filecoin.service.js";
+import { createError } from "../utils/errorhandler.js";
 
 // My Filecoin storage and retrieval will be handled here
 export const storeOnFilecoin = async (req, res, next) => {
