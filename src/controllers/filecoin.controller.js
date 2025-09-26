@@ -1,29 +1,43 @@
-import { readFile } from "fs/promises";
-import FilecoinService from "../services/filecoin.service.js";
+import { create } from "@web3-storage/w3up-client";
+import { Blob } from "buffer";
 import { createError } from "../utils/errorhandler.js";
 
-// My Filecoin storage and retrieval will be handled here
-export const storeOnFilecoin = async (req, res, next) => {
-  try {
-    const { fileId, reportId } = req.body;
-    const dataset = await readFile(`uploads/validated_${fileId}.json`);
-    const report = await readFile(`uploads/${reportId}.json`);
+export class FilecoinService {
+  static async storeData(files) {
+    try {
+      const client = await create();
+      await client.login(process.env.DID);
 
-    const cid = await FilecoinService.storeData([dataset, report]);
+      const blobs = files.map((fileContent) => new Blob([fileContent]));
+      const space = await client.getSpace(process.env.SPACE);
+      const cid = await space.uploadFiles(blobs);
 
-    res.json({ cid, message: "Data stored on Filecoin" });
-  } catch (error) {
-    next(error);
+      return cid.toString();
+    } catch (error) {
+      throw createError(500, `w3up storage failed: ${error.message}`);
+    }
   }
-};
 
-export const verifyByCID = async (req, res, next) => {
-  try {
-    const { cid } = req.params;
-    const data = await FilecoinService.retrieveData(cid);
+  static async retrieveData(cid) {
+    try {
+      const client = await create();
+      await client.login(process.env.DID);
 
-    res.json({ dataset: JSON.parse(data[0]), report: JSON.parse(data[1]) });
-  } catch (error) {
-    next(error);
+      const space = await client.getSpace(process.env.SPACE);
+      const response = await space.downloadFiles(cid);
+
+      const files = [];
+      for await (const file of response) {
+        files.push(await file.text());
+      }
+
+      if (files.length < 2) {
+        throw new Error("Expected 2 files (dataset + report)");
+      }
+
+      return files;
+    } catch (error) {
+      throw createError(500, `w3up retrieval failed: ${error.message}`);
+    }
   }
-};
+}
