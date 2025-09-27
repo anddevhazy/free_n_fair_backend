@@ -1,0 +1,16 @@
+diff --git a/node_modules/synthik-client/dist/index.js b/node_modules/synthik-client/dist/index.js
+index 531c0c1..b48e77c 100644
+--- a/node_modules/synthik-client/dist/index.js
++++ b/node_modules/synthik-client/dist/index.js
+@@ -1,7 +1,7 @@
+-import HttpClient from "./http";
+-import { TabularClient } from "./endpoints/tabular";
+-import { TextClient } from "./endpoints/text";
+-export * from "./types";
++import HttpClient from "./http.js";
++import { TabularClient } from "./endpoints/tabular.js";
++import { TextClient } from "./endpoints/text.js";
++export * from "./types.js";
+ // Hard-coded base URL; not user-configurable
+ const BASE_URL = "https://moral-danice-poeai-c2f6213c.koyeb.app";
+ export class SynthikClient {

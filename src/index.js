@@ -19,8 +19,8 @@ app.use(express.json());
 app.post("/auth/login", authController.login);
 app.post("/upload", upload.single("dataset"), datasetController.uploadDataset);
 app.post("/analyze", analysisController.analyzeDataset);
-app.post("/store", filecoinController.storeOnFilecoin);
-app.get("/verify/:cid", filecoinController.verifyByCID);
+app.post("/store", filecoinController.uploadDataset);
+app.get("/verify/:cid", filecoinController.retrieveDataset);
 
 app.use(errorHandler);
 
